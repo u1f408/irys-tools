@@ -52,7 +52,7 @@ try
 	// grab the avatar image
 	if ($pk_json !== false)
 	{
-		$match_id = '/(?:\/|(?:\?|&)id=)(?:' . preg_quote($pk_json['id']) . '|' . preg_quote($pk_json['uuid']) . ')(?:\.|&|$)/';
+		$match_id = '/(?:\/|(?:\?|&)id=)(?:' . preg_quote($pk_json['id'] ?? '') . '|' . preg_quote($pk_json['uuid'] ?? '') . ')(?:\.|&|$)/';
 		$avatar_url = $pk_json[$api_avatar] ?? '';
 
 		// fallback on empty avatar url
