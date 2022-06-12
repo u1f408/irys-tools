@@ -19,11 +19,16 @@
 require_once(dirname(__DIR__) . '/bootstrap.php');
 define("API_BASE", "https://api.pluralkit.me/v2");
 
-if (empty($type = trim($_GET['ty'] ?? ''))) die("missing param: ty");
-if (!in_array($type, ['m', 's' ,'g'])) die("invalid param: ty");
-if (empty($pk_id = trim($_GET['id'] ?? ''))) die("missing param: id");
-if (empty($fallback = trim($_GET['fb'] ?? ''))) $fallback = "https://cdn.discordapp.com/embed/avatars/0.png";
-if (($resolution = intval(trim($_GET['rs'] ?? '0'))) === 0) $resolution = 256;
+if (empty($type = trim($_GET['ty'] ?? '')))
+	die("missing param: ty");
+if (!in_array($type, ['m', 's' ,'g']))
+	die("invalid param: ty");
+if (empty($pk_id = trim($_GET['id'] ?? '')))
+	die("missing param: id");
+if (empty($fallback = trim($_GET['fb'] ?? '')))
+	$fallback = "https://cdn.discordapp.com/embed/avatars/0.png";
+if (($resolution = intval(trim($_GET['rs'] ?? '0'))) === 0)
+	$resolution = 256;
 
 $avatar_data = false;
 $api_avatar = 'avatar_url';
@@ -52,18 +57,26 @@ try
 	// grab the avatar image
 	if ($pk_json !== false)
 	{
-		$match_id = '/(?:\/|(?:\?|&)id=)(?:' . preg_quote($pk_json['id'] ?? '') . '|' . preg_quote($pk_json['uuid'] ?? '') . ')(?:\.|&|$)/';
+		$match_id = '/(?:\/|(?:\?|&)id=)(?:'
+			. preg_quote($pk_json['id'] ?? '')
+			. '|'
+			. preg_quote($pk_json['uuid'] ?? '')
+			. ')(?:\.|&|$)/';
+
 		$avatar_url = $pk_json[$api_avatar] ?? '';
 
 		// fallback on empty avatar url
-		if (empty($avatar_url)) $avatar_data = false;
+		if (empty($avatar_url))
+			$avatar_data = false;
 
 		// fallback if avatar url has our hostname in it
-		else if (str_contains($avatar_url, $_SERVER['SERVER_NAME'])) $avatar_data = false;
+		else if (str_contains($avatar_url, $_SERVER['SERVER_NAME']))
+			$avatar_data = false;
 
 		// fallback if avatar url contains the member ID or UUID
 		// (in a specific format, that matches invocations of this script)
-		else if (preg_match($match_id, $avatar_url) === 1) $avatar_data = false;
+		else if (preg_match($match_id, $avatar_url) === 1)
+			$avatar_data = false;
 
 		// otherwise, we're good
 		else
@@ -87,7 +100,8 @@ $image = new Imagick();
 $image->readImageBlob($avatar_data);
 
 // get source resolution, prevent upscaling if it's smaller than `$resolution`
-if (($source_res = min($image->getImageGeometry())) < $resolution) $resolution = $source_res;
+if (($source_res = min($image->getImageGeometry())) < $resolution)
+	$resolution = $source_res;
 
 // thumbnail the image
 $image->cropThumbnailImage($resolution, $resolution);
