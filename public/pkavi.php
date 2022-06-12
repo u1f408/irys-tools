@@ -52,7 +52,21 @@ try
 	// grab the avatar image
 	if ($pk_json !== false)
 	{
-		if ($pk_json[$api_avatar] !== null && !empty($pk_json[$api_avatar]))
+		$match_id = '/(?:\/|(?:\?|&)id=)(?:' . preg_quote($pk_json['id']) . '|' . preg_quote($pk_json['uuid']) . ')(?:\.|&|$)/';
+		$avatar_url = $pk_json[$api_avatar] ?? '';
+
+		// fallback on empty avatar url
+		if (empty($avatar_url)) $avatar_data = false;
+
+		// fallback if avatar url has our hostname in it
+		else if (str_contains($avatar_url, $_SERVER['SERVER_NAME'])) $avatar_data = false;
+
+		// fallback if avatar url contains the member ID or UUID
+		// (in a specific format, that matches invocations of this script)
+		else if (preg_match($match_id, $avatar_url) === 1) $avatar_data = false;
+
+		// otherwise, we're good
+		else
 		{
 			$avatar_data = hCurlFetch($pk_json[$api_avatar]);
 		}
