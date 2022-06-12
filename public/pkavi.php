@@ -68,12 +68,17 @@ catch (\Exception $e)
 if ($avatar_data === false)
 	$avatar_data = hCurlFetch($fallback);
 
-// create image, thumbnail it
+// create Imagick image
 $image = new Imagick();
 $image->readImageBlob($avatar_data);
+
+// get source resolution, prevent upscaling if it's smaller than `$resolution`
+if (($source_res = min($image->getImageGeometry())) < $resolution) $resolution = $source_res;
+
+// thumbnail the image
 $image->cropThumbnailImage($resolution, $resolution);
 
-// send image to client
+// send image to client as a JPEG
 $image->setImageFormat('jpeg');
 header('Content-Type: image/jpeg');
 print $image->getImageBlob();
