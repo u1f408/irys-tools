@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="//irys.cc/styles.css">
+  <title>tools.irys.cc</title>
+</head>
+<body>
+  <h1>tools.irys.cc</h1>
+
+  <p><strong>You probably want <a href="https://irys.cc">the main page at irys.cc</a>, rather than this page!</strong></p>
+  <p>This page lists the small server-side tools run by <a href="https://catstret.ch" target="_blank">the Iris System</a>, some of which are used by the client-side tools on <a href="https://irys.cc">irys.cc</a>.</p>
+
+  <section id="pkavi">
+    <header>
+      <h1>
+        PluralKit avatar proxy
+        <a href="#pkavi" class="section-marker">&#xb6;</a>
+      </h1>
+    </header>
+
+    <ul>
+      <li>Members: <code>https://tools.irys.cc/pkavi/m/&lt;id&gt;</code></li>
+      <li>Systems: <code>https://tools.irys.cc/pkavi/s/&lt;id&gt;</code></li>
+      <li>Groups: <code>https://tools.irys.cc/pkavi/g/&lt;id&gt;</code></li>
+    </ul>
+
+    <p>All <code>&lt;id&gt;</code> fields can be the 5-character ID; the UUID (as returned by the API); or, in the case of systems, a Discord account ID.</p>
+    <p>Falls back to the Discord "blurple" avatar if there was an error retrieving the requested avatar; or if the requested object does not have an avatar/icon set.</p>
+    <p>A file extension can optionally be appended to the URL, however, it is ignored - the returned image is always a JPEG.</p>
+  </section>
+
+  <section id="oh-boy-it-broke">
+    <header>
+      <h1>
+        Help, something broke?!
+        <a href="#oh-boy-it-broke" class="section-marker">&#xb6;</a>
+      </h1>
+    </header>
+
+    <p>Contact the Iris System:</p>
+    <ul>
+      <!-- these are intentionally "obfuscated" so the _really terrible_ scraping bots don't pick up the details, lmao -->
+      <li>Email: <code>&#116;&#111;&#111;&#108;&#115;&#64;&#105;&#114;&#105;&#115;&#46;&#97;&#99;&#46;&#110;&#122;&#10;</code></li>
+      <li>Discord: <code>&#105;&#114;&#105;&#115;&#33;&#35;&#49;&#51;&#49;&#50;&#10;</code></li>
+    </ul>
+  </section>
+</body>
+</html>

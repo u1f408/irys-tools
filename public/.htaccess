@@ -1,0 +1,6 @@
+Options +FollowSymlinks -Indexes
+RewriteEngine On
+RewriteCond %{SCRIPT_FILENAME} !-d
+RewriteCond %{SCRIPT_FILENAME} !-f
+
+RewriteRule ^/?pkavi/([msg])/(.*)(?:\.[a-z]+)?$ pkavi.php?ty=$1&id=$2 [L,QSA]
