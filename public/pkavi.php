@@ -14,10 +14,22 @@
  * - `id` (required) - PluralKit 5-character ID (or UUID) of the chosen object type
  * - `fb` (optional) - URL to fallback image (defaults to Discord default avatar)
  * - `rs` (optional) - Resolution of image (defaults to `256`, for 256x256px output)
+ *
+ * Configuration options (config.inc.php):
+ * - `PLURALKIT_API_BASE` - string, defaults to https://api.pluralkit.me
+ * - `PKAVI_CACHE_ENABLED` - bool, whether to cache avatars (defaults to `false`)
+ * - `PKAVI_CACHE_PATH` - string, where to cache avatars
+ *    defaults to `BASE_DIR . '/cache/pkavi'`)
  */
 
 require_once(dirname(__DIR__) . '/bootstrap.php');
-define("API_BASE", "https://api.pluralkit.me/v2");
+
+if (!defined("PLURALKIT_API_BASE"))
+	define("PLURALKIT_API_BASE", "https://api.pluralkit.me");
+if (!defined("PKAVI_CACHE_ENABLED"))
+	define("PKAVI_CACHE_ENABLED", false);
+if (!defined("PKAVI_CACHE_PATH"))
+	define("PKAVI_CACHE_PATH", BASE_DIR . '/cache/pkavi');
 
 if (empty($type = trim($_GET['ty'] ?? '')))
 	die("missing param: ty");
@@ -30,7 +42,7 @@ if (empty($fallback = trim($_GET['fb'] ?? '')))
 if (($resolution = intval(trim($_GET['rs'] ?? '0'))) === 0)
 	$resolution = 256;
 
-$avatar_data = false;
+$avatar_url_hash = $avatar_data = false;
 $api_avatar = 'avatar_url';
 $api_component = 'undefined';
 
@@ -51,7 +63,7 @@ else if ($type === 'g')
 try
 {
 	// grab data from PluralKit API
-	$api_url = API_BASE . '/' . $api_component . '/' . $pk_id;
+	$api_url = PLURALKIT_API_BASE . '/v2/' . $api_component . '/' . $pk_id;
 	$pk_json = hCurlFetch($api_url, [], true);
 
 	// grab the avatar image
@@ -81,7 +93,18 @@ try
 		// otherwise, we're good
 		else
 		{
-			$avatar_data = hCurlFetch($pk_json[$api_avatar]);
+			$avatar_url_hash = hash("sha256", $pk_json[$api_avatar]);
+			if (PKAVI_CACHE_ENABLED && $avatar_url_hash !== false)
+			{
+				if (file_exists($cache_path = (PKAVI_CACHE_PATH . '/' . $avatar_url_hash)))
+					$avatar_data = $cache_path;
+				else
+					$avatar_data = hCurlFetch($pk_json[$api_avatar]);
+			}
+			else
+			{
+				$avatar_data = hCurlFetch($pk_json[$api_avatar]);
+			}
 		}
 	}
 }
@@ -91,9 +114,21 @@ catch (\Exception $e)
 	$avatar_data = false;
 }
 
+// if we have a cached image, return it immediately
+if (PKAVI_CACHE_ENABLED && str_starts_with($avatar_data, PKAVI_CACHE_PATH))
+{
+	header('Content-Type: image/jpeg');
+	print file_get_contents($avatar_data);
+	exit;
+}
+
 // grab fallback image if we have no avatar data
+$cache_disable = false;
 if ($avatar_data === false)
+{
+	$cache_disable = true;
 	$avatar_data = hCurlFetch($fallback);
+}
 
 // create Imagick image
 $image = new Imagick();
@@ -106,7 +141,19 @@ if (($source_res = min($image->getImageGeometry())) < $resolution)
 // thumbnail the image
 $image->cropThumbnailImage($resolution, $resolution);
 
-// send image to client as a JPEG
+// get image blob
 $image->setImageFormat('jpeg');
+$image_blob = $image->getImageBlob();
+
+// send image to client as a JPEG
 header('Content-Type: image/jpeg');
-print $image->getImageBlob();
+print $image_blob;
+
+// write to cache
+if (PKAVI_CACHE_ENABLED && !$cache_disable && $avatar_url_hash !== false)
+{
+	if (!file_exists(PKAVI_CACHE_PATH))
+		mkdir(PKAVI_CACHE_PATH, 0777, true);
+
+	file_put_contents(PKAVI_CACHE_PATH . '/' . $avatar_url_hash, $image_blob);
+}
