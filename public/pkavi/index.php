@@ -67,7 +67,7 @@ try
 	$pk_json = hCurlFetch($api_url, [], true);
 
 	// grab the avatar image
-	if ($pk_json !== false)
+	if ($pk_json !== false && ($pk_json['code'] ?? 0) === 0)
 	{
 		$match_id = '/(?:\/|(?:\?|&)id=)(?:'
 			. preg_quote($pk_json['id'] ?? '')
@@ -115,7 +115,7 @@ catch (\Exception $e)
 }
 
 // if we have a cached image, return it immediately
-if (PKAVI_CACHE_ENABLED && str_starts_with($avatar_data, PKAVI_CACHE_PATH))
+if (PKAVI_CACHE_ENABLED && $avatar_data !== false && str_starts_with($avatar_data, PKAVI_CACHE_PATH))
 {
 	header('Content-Type: image/jpeg');
 	print file_get_contents($avatar_data);
