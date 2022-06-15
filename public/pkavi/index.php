@@ -22,7 +22,7 @@
  *    defaults to `BASE_DIR . '/cache/pkavi'`)
  */
 
-require_once(dirname(__DIR__) . '/bootstrap.php');
+require_once(dirname(dirname(__DIR__)) . '/bootstrap.php');
 
 if (!defined("PLURALKIT_API_BASE"))
 	define("PLURALKIT_API_BASE", "https://api.pluralkit.me");

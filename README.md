@@ -21,7 +21,8 @@ there's a `.htaccess` present with the rewrite rules.
 Here's the rewrites:
 
 ```nginx
-rewrite ^/pkavi/([msg])/(.*)(?:\.[a-z]+)?$ /pkavi.php?ty=$1&id=$2&$args last;
+rewrite ^/pkavi/([msg])/(.*)(?:\.[a-z]+)?$ /pkavi/index.php?ty=$1&id=$2&$args last;
+rewrite ^/pkavi/stats(?:\.json)?$ /pkavi/cache.php?$args last;
 ```
 
 ## License
